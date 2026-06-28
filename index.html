@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy 23 Bedi</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎂</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,400;1,600&family=Syne:wght@800&family=Space+Grotesk:wght@300;500;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+        body {
+            background-color: #ffffff;
+            font-family: 'Space Grotesk', sans-serif;
+            color: #ffffff;
+            overflow-x: hidden;
+            transition: background-color 0.4s ease;
+        }
+        .lock-scroll {
+            overflow: hidden !important;
+            height: 100vh !important;
+        }
+        .page-wrapper {
+            width: 100%;
+            overflow-x: hidden;
+            position: relative;
+        }
+        .grain-texture {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* ==========================================================================
+           НАЧАЛЬНЫЙ ЭКРАН И ХАОС С ЕМИНЕМОМ
+           ========================================================================== */
+        #intro-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100vh;
+            background: #ffc2eb;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            overflow: hidden;
+        }
+        .cringe-gif {
+            width: 90%;
+            max-width: 420px;
+            border: 8px ridge #ff007f;
+            box-shadow: 0 0 25px rgba(255, 0, 127, 0.5);
+            margin-bottom: 25px;
+        }
+        .trash-button {
+            padding: 15px 35px;
+            font-family: "MS Sans Serif", Tahoma, sans-serif;
+            font-size: 1.1rem;
+            font-weight: bold;
+            background: #e0e0e0;
+            border-top: 3px solid #fff;
+            border-left: 3px solid #fff;
+            border-right: 3px solid #808080;
+            border-bottom: 3px solid #808080;
+            color: #000;
+            cursor: pointer;
+            box-shadow: 2px 2px 0 #000;
+        }
+        .trash-button:active {
+            border-top: 3px solid #808080;
+            border-left: 3px solid #808080;
+            border-right: 3px solid #fff;
+            border-bottom: 3px solid #fff;
+        }
+
+        .meme-video-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: #000000;
+        }
+        .meme-video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .broski-text {
+            position: absolute;
+            top: 26%;
+            left: 75%;
+            transform: translate(-50%, -50%);
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.2rem;
+            color: #000000;
+            z-index: 10002;
+            pointer-events: none;
+            white-space: nowrap;
+            display: none;
+        }
+
+        /* Контейнер кнопки: смещен в правую сторону к Эминему и приподнят */
+        .eminem-btn-container {
+            position: fixed;
+            bottom: calc(34% - 25px);
+            left: 45%;
+            transform: translateX(-100%);
+            width: auto;
+            display: none;
+            opacity: 0;
+            z-index: 10005;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .eminem-btn-container.show {
+            display: block;
+            opacity: 1;
+        }
+        .eminem-gift-btn {
+            width: 360px;
+            padding: 22px 20px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 800;
+            font-size: 1.45rem;
+            color: #ff007f;
+            background: #ffffff;
+            border: 5px ridge #ff007f;
+            border-radius: 6px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 0 25px rgba(255, 0, 127, 0.4), 4px 4px 0 #000;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            text-align: center;
+        }
+        .eminem-gift-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 35px rgba(255, 0, 127, 0.7), 6px 6px 0 #000;
+        }
+        .eminem-gift-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 0 10px rgba(255, 0, 127, 0.2), 2px 2px 0 #000;
+        }
+
+        /* Кнопка Skip (появляется только со второго визита) */
+        .skip-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10010;
+            padding: 10px 20px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: all 0.2s ease;
+            display: none;
+        }
+        .skip-btn:hover {
+            color: #fff;
+            background: rgba(255, 0, 127, 0.7);
+            border-color: #ff007f;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.5);
+        }
+
+        /* ==========================================================================
+           ОСНОВНОЙ КОНТЕНТ САЙТА
+           ========================================================================== */
+        #flash {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffffff;
+            z-index: 20000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease-in;
+        }
+        #main-content {
+            display: none;
+            min-height: 100vh;
+            background: radial-gradient(circle at center, #001f9c 0%, #03071e 100%);
+            position: relative;
+            padding: 40px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .hero-container {
+            position: relative;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        .bg-cake-png {
+            position: absolute;
+            width: 280px;
+            height: auto;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            opacity: 0.35;
+            pointer-events: none;
+            animation: pulseGlow 4s ease-in-out infinite alternate;
+        }
+        .hero-age {
+            font-family: 'Syne', sans-serif;
+            font-size: 15rem;
+            line-height: 1.0;
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            letter-spacing: -4px;
+            background: linear-gradient(to bottom, #ffffff 30%, #00ebff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            z-index: 2;
+        }
+        @keyframes pulseGlow {
+            0% { opacity: 0.25; filter: drop-shadow(0 0 10px rgba(0,235,255,0.3)); }
+            100% { opacity: 0.45; filter: drop-shadow(0 0 25px rgba(0,235,255,0.7)); }
+        }
+        .title-tr {
+            font-family: 'Syne', sans-serif;
+            font-size: 3.5rem;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 2;
+        }
+        .title-de {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 2.5rem;
+            color: #ff007f;
+            position: relative;
+            z-index: 2;
+            margin-bottom: 150px;
+        }
+        .scroll-hint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.6);
+            position: relative;
+            z-index: 2;
+            cursor: pointer;
+            user-select: none;
+            transition: opacity 0.4s ease;
+        }
+        .scroll-hint span {
+            font-size: 1.5rem;
+            color: #00ebff;
+            animation: bounceArrow 1.6s infinite ease-in-out;
+        }
+        @keyframes bounceArrow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(8px); }
+        }
+        .poster-section {
+            width: 100%;
+            background: radial-gradient(circle at center, #001775 0%, #03071e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px 80px 20px;
+        }
+        .center-main-photo {
+            max-width: 1300px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+        .center-main-photo img {
+            width: 100%;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 12px;
+            filter: drop-shadow(0 20px 50px rgba(0, 0, 0, 0.7));
+        }
+        #scroll-section {
+            background: #03071e;
+            padding: 120px 20px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            overflow: hidden;
+        }
+        .flirty-headline {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-weight: 300;
+            font-size: 4rem;
+            text-align: center;
+            color: #00ebff;
+            max-width: 800px;
+            margin-bottom: 60px;
+            line-height: 1.1;
+        }
+        .lang-switcher {
+            display: flex;
+            justify-content: flex-end;
+            max-width: 680px;
+            width: 100%;
+            gap: 10px;
+            margin-bottom: 15px;
+            z-index: 10;
+        }
+        .lang-cube {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.5);
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            user-select: none;
+        }
+        .lang-cube:hover {
+            border-color: #ff007f;
+            color: #ffffff;
+            background: rgba(255, 0, 127, 0.05);
+            transform: translateY(-2px);
+        }
+        .lang-cube.active {
+            background: #00ebff;
+            border-color: #00ebff;
+            color: #03071e;
+            box-shadow: 0 0 15px rgba(0, 235, 255, 0.6);
+            transform: scale(1.05);
+        }
+        .letter-container {
+            max-width: 680px;
+            width: 100%;
+            z-index: 5;
+            position: relative;
+            background: rgba(255, 255, 255, 0.01);
+            padding: 40px;
+            border-left: 2px solid #ff007f;
+            margin-bottom: 60px;
+        }
+        .letter-container p {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: #cbd5e1;
+            margin-bottom: 25px;
+            font-weight: 300;
+        }
+        .lang-content {
+            display: none;
+        }
+        .lang-content.active {
+            display: block;
+        }
+        .cutout-photo {
+            position: absolute;
+            width: 240px;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .cutout-photo img {
+            width: 100%;
+            height: auto;
+            display: block;
+            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.7));
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) var(--fade-start, 60%), rgba(0,0,0,0) var(--fade-end, 100%));
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,1) var(--fade-start, 60%), rgba(0,0,0,0) var(--fade-end, 100%));
+        }
+        #f1 img { -webkit-mask-image: none !important; mask-image: none !important; }
+        #f3 img { padding-top: 45px; }
+        #f2, #f4 img { width: 300px; }
+        .side-l1 { left: 4%; top: 12%; transform: translateX(-100px) rotate(-5deg); }
+        .side-r1 { right: 4%; top: 30%; transform: translateX(100px) rotate(6deg); }
+        .side-l2 { left: 5%; top: 48%; transform: translateX(-100px) rotate(8deg); }
+        .side-r2 { right: 4%; top: 66%; transform: translateX(100px) rotate(-4deg); }
+        .side-l3 { left: 3%; top: 84%; transform: translateX(-100px) rotate(-7deg); }
+        .cutout-photo.visible {
+            opacity: 1;
+            transform: translateX(0) rotate(var(--r));
+        }
+        .hair-pointer {
+            position: absolute;
+            left: -50px;
+            top: 13%;
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 1.25rem;
+            color: #ffffff;
+            opacity: 0.9;
+            transform: rotate(4deg);
+            white-space: nowrap;
+            pointer-events: none;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+        }
+        footer {
+            width: 100%;
+            padding: 50px 20px;
+            text-align: center;
+            background: linear-gradient(180deg, #03071e 0%, #000000 100%);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-top: -1px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .footer-text {
+            color: #ffffff;
+            font-weight: bold;
+            opacity: 0.9;
+            display: inline-block;
+        }
+        .footer-text span {
+            color: #ff007f;
+            text-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
+        }
+        footer .me {
+            height: 38px;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+            display: inline-block;
+            vertical-align: middle;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+        }
+        @media (max-width: 1100px) {
+            .hero-age { font-size: 10rem; }
+            .title-tr { font-size: 2.2rem; }
+            .flirty-headline { font-size: 2.5rem; }
+            .bg-cake-png { width: 180px; }
+            .center-main-photo { max-width: 95%; }
+            .hair-pointer { display: none; }
+            .cutout-photo {
+                position: static;
+                width: 180px;
+                margin: 25px auto;
+                opacity: 1 !important;
+                transform: none !important;
+            }
+            #scroll-section { display: flex; flex-direction: column; }
+            .lang-switcher { justify-content: center; }
+            .broski-text { font-size: 0.8rem; top: 25%; left: 73%; }
+            .eminem-btn-container { left: 50% !important; transform: translateX(-50%) !important; bottom: 30% !important; }
+            .eminem-gift-btn { max-width: 100%; width: 300px; font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body class="lock-scroll">
+  <div class="page-wrapper">
+    <div class="grain-texture"></div>
+    <div id="flash"></div>
+
+    <button id="skip-intro-btn" class="skip-btn" onclick="skipIntro()">Skip</button>
+
+    <div id="intro-screen">
+        <div id="cringe-stage" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%;">
+            <img src="01.gif" alt="Happy Birthday Cringe" class="cringe-gif">
+            <button class="trash-button" onclick="startMemeVideo()">CLICK HERE</button>
+        </div>
+
+        <div class="meme-video-container" id="video-stage">
+            <video id="meme-video" src="video.mp4" preload="auto"></video>
+            <div class="broski-text" id="broski-bubble">whats up broski</div>
+        </div>
+    </div>
+
+    <div class="eminem-btn-container" id="eminem-box">
+        <button class="eminem-gift-btn" onclick="endChaosAndRevealSite()">
+            💖 Receive gift 💖
+        </button>
+    </div>
+
+    <div id="main-content">
+        <audio id="birthday-music" src="birthday.mp3" preload="auto"></audio>
+
+        <div class="hero-container">
+            <img src="cake.png" alt="Cake Background" class="bg-cake-png">
+            <div class="hero-age">23</div>
+        </div>
+        <h1 class="title-tr">İyi ki Doğdun, Bedi!</h1>
+        <span class="title-de">Alles Gute zum Geburtstag!</span>
+        <div class="scroll-hint" onclick="scrollToPoster()">
+            Scroll down
+            <span>↓</span>
+        </div>
+    </div>
+    <div class="poster-section" id="poster-target">
+        <div class="center-main-photo">
+            <img src="poster.jpg" alt="Happy Birthday Content Photo">
+        </div>
+    </div>
+    <div id="scroll-section">
+        <div class="cutout-photo side-l1" id="f1" style="--r: -5deg; --fade-start: 50%; --fade-end: 90%;">
+            <img src="01.png" alt="Photo 1">
+        </div>
+        <div class="cutout-photo side-r1" id="f2" style="--r: 6deg; --fade-start: 65%; --fade-end: 100%;">
+            <img src="02.png" alt="Photo 2">
+        </div>
+        <div class="cutout-photo side-l2" id="f3" style="--r: 8deg; --fade-start: 55%; --fade-end: 95%;">
+            <img src="03.png" alt="Photo 3">
+        </div>
+        <div class="cutout-photo side-r2" id="f4" style="--r: -4deg; --fade-start: 70%; --fade-end: 100%;">
+            <div class="hair-pointer">cool hair :) →</div>
+            <img src="04.png" alt="Photo 4">
+        </div>
+        <div class="cutout-photo side-l3" id="f5" style="--r: -7deg; --fade-start: 60%; --fade-end: 95%;">
+            <img src="05.png" alt="Photo 5">
+        </div>
+        <h2 class="flirty-headline">
+            "Umarım her geçen yıl daha da karizmatik ve yakışıklı olursun..."
+        </h2>
+
+        <div class="lang-switcher">
+            <div class="lang-cube" onclick="changeLang('de')">DE</div>
+            <div class="lang-cube active" onclick="changeLang('tr')">TR</div>
+            <div class="lang-cube" onclick="changeLang('en')">EN</div>
+        </div>
+
+<div class="letter-container">
+    <div id="lang-tr" class="lang-content active">
+        <p><strong>Dürüst olmak gerekirse,</strong> internette yabancılarla tanışmaktan ve kendimi açmaktan hâlâ biraz korkuyorum. Ama o gün oyunda korkumu yendiğim, sana Discord adresimi verdiğim ve seninle tanıştığım için bir an bile pişman değilim.</p>
+
+        <p>Ortak köklere sahip bir dosta sahip olmak (sen Türk, ben Kazak) inanılmaz, çok sıcak bir duygu. Dünyan hakkında henüz çok şey bilmiyorum ama iç sesim inatla senin gerçekten iyi, nadir bir insan olduğunu söylüyor... ve seni daha yakından tanımayı çok istiyorum.</p>
+
+        <p>Biliyor musun, bu hediyenin en kolay kısmı bu web sitesinin kodlaması ya da tasarımıydı. Ve başlangıcın biraz cringe olduğunu biliyorum XD. Birkaç satır kod yazmak ya da Photoshop'ta bir poster hazırlamak benim için sadece birkaç tıklama meselesi. Bir keresinde sinemaya girebilmek için pasaportumdaki doğum yılı rakamını kendim değiştirmiştim ;) , yani Photoshop konusunda oldukça iyiyim. Posteri tamamen kendim hazırladım ve içine senin için birkaç küçük sürpriz sakladım — umarım hepsini bulur ve her şeyi anlarsın.</p>
+
+        <p>En zor, en hassas ve en uzun süreç ise şu anda okumakta olduğun bu mektubu yazmaktı. Doğru kelimeleri bulmak, kod yazmaktan ya da bir editörde katmanlar arasında gezinmekten çok daha zordu. Bu satırlara düşüncelerimin büyük bir kısmını döktüm, çünkü sana karşı tamamen dürüst olmak ve çok daha özgün bir şey ortaya çıkarmak istedim.</p>
+
+        <p>Ve bu mektubu yazarken, hayatın ne kadar tuhaf ve aynı zamanda ne kadar güzel olabileceğini düşünmeden edemedim. Farklı ülkelerde yaşıyoruz ama her gün aynı güneşe bakıyor, aynı ay ışığını görüyoruz; yine de sıradan gerçeklikte yollarımız büyük ihtimalle hiçbir zaman kesişmezdi. Ama tanıştık — ve bunun tek sebebi rastgele girdiğimiz bir oyundu.  </p>
+        <p>Belki de bu sadece bir tesadüf... Ya da belki kaderin bizim için çok daha ilginç planları vardır. Bunu zaman gösterecek. Ama hayatıma girdiğin için gerçekten çok mutluyum. Bu küçük hediyenin aramızdaki uzun ve harika bir hikâyenin başlangıcı olmasını istiyorum. Kim bilir... belki bir gün gerçekten bir yerde birlikte oturup çay (ya da kahve) içer, bu satırları tekrar okur ve her şeyin ne kadar komik ve basit başladığına gülümseriz.</p>
+
+        <p style="margin-top: 40px; font-family: 'Cormorant Garamond'; font-style: italic; font-size: 1.6rem; color: #00ebff; text-align: right;">
+            Doğum günün kutlu olsun, Bedi! Yeni yaşın, hayatıma kattığın o güzel renkler kadar harika keşiflerle dolu olsun. 🌙🤍
+        </p>
+    </div>
+
+    <div id="lang-de" class="lang-content">
+        <p><strong>Ehrlich gesagt</strong> habe ich immer noch ein wenig Angst davor, online Fremden zu begegnen und mich ihnen zu öffnen. Aber ich bereue keine einzige Sekunde, dass ich an jenem Tag im Spiel meine Angst überwunden, dir meine Discord-ID gegeben und dich kennengelernt habe.</p>
+
+        <p>Einen Freund zu haben, mit dem man dieselben Wurzeln teilt (du bist Türke, ich bin Kasache), ist ein unglaubliches, sehr warmes Gefühl. Ich weiß zwar noch nicht viel über deine Welt, aber meine innere Stimme sagt mir hartnäckig, dass du ein wirklich guter, seltener Mensch bist... und ich möchte dich unbedingt besser kennenlernen.</p>
+
+        <p>Weißt du, der einfachste Teil dieses Geschenks war das Codieren oder das Design dieser Website. Und ich weiß, dass der Anfang ziemlich cringe war XD. Ein paar Zeilen Code zu schreiben oder ein Poster in Photoshop zu erstellen, ist für mich nur eine Frage von wenigen Klicks. Ich habe sogar mal mein Geburtsjahr im Reisepass geändert, um ins Kino zu kommen ;) , also kenne ich mich mit Photoshop bestens aus. Ich habe das Poster komplett selbst gestaltet und ein paar kleine Überraschungen darin versteckt — ich hoffe, du findest sie und verstehst alles.</p>
+
+        <p>Der schwierigste, emotionalste und langwierigste Prozess war jedoch genau dieser Brief, den du gerade liest. Die richtigen Worte zu finden, war weitaus schwieriger, als Code zu schreiben oder Ebenen im Editor zu verschieben. Ich habe so viele Gedanken in diese Zeilen gesteckt, weil ich absolut ehrlich zu dir sein und etwas viel Originelleres schaffen wollte.</p>
+
+        <p>Und während ich diesen Brief schrieb, musste ich ständig daran denken, wie seltsam und zugleich wunderschön das Leben sein kann. Wir leben in verschiedenen Ländern, doch jeden Tag blicken wir auf dieselbe Sonne und sehen dasselbe Mondlicht; im gewöhnlichen Leben würden sich unsere Wege jedoch wie in parallelen Universen bewegen und sich höchstwahrscheinlich nie kreuzen. Aber wir haben uns getroffen — und das alles nur dank eines zufälligen Spiels. </p>
+          <p>Vielleicht ist es nur ein Zufall... Oder vielleicht hat das Schicksal noch viel interessantere Pläne mit uns. Die Zeit wird es zeigen. Aber ich bin wirklich glücklich, dass du in mein Leben getreten bist. Ich wünsche mir, dass dieses kleine GESCHENK der Anfang einer langen und wunderbaren Geschichte zwischen uns wird. Wer weiß... vielleicht sitzen wir eines Tages wirklich irgendwo zusammen, trinken Tee (oder Kaffee), lesen diese Zeilen noch einmal und lächeln darüber, wie lustig und einfach alles begonnen hat.</p>
+
+        <p style="margin-top: 40px; font-family: 'Cormorant Garamond'; font-style: italic; font-size: 1.6rem; color: #00ebff; text-align: right;">
+            Alles Gute zum Geburtstag, Bedi! Möge dieses neue Lebensjahr dir ebenso wundervolle Entdeckungen bringen wie die schönen Farben, die du in mein Leben gebracht hast. 🌙🤍
+        </p>
+    </div>
+
+    <div id="lang-en" class="lang-content">
+        <p><strong>To be honest,</strong> I'm still a little scared of meeting strangers online and opening myself up. But I don't regret for a single moment that day I overcame my fear in the game, gave you my Discord id, and met you.</p>
+
+        <p>Having a friend with shared roots (you're Turkish, I'm Kazakh) is an incredible, very warm feeling. I don't know much about your world yet, but my inner voice stubbornly tells me you're a really good, rare person... and I really want to get to know you better.</p>
+
+        <p>You know, the easiest part of this gift was the coding or design of this website. And I know the beginning was a cringe XD. Writing a few lines of code or making a poster in Photoshop is just a matter of a few clicks for me. I once changed the birth year number on my passport myself so I could get into a movie ;) , so I'm pretty good with Photoshop. Thats why i made the poster entirely myself, and I hid a few little surprises inside for you — I hope you find them and understand everything.</p>
+
+        <p>The most difficult, delicate, and longest process was writing this letter you are currently reading. Finding the right words was far harder than writing code or scrolling through layers in an editor. I poured so many of my thoughts into these lines because I wanted to be completely honest with you and create something far more original.</p>
+
+        <p>And while writing this letter, I couldn't stop thinking about how strange and beautiful life can be. We are in different countries, but every day we look at the same sun, catch the same moonlight; whereas in ordinary reality, our paths would most likely never cross. But we met — and it was all thanks to a random game.</p>
+         <p>Maybe it's just a coincidence... Or maybe fate has much more interesting plans for us. Time will tell. But I'm truly happy that you came into my life. I want this little gift to be the beginning of a long and wonderful story between us. Who knows... maybe one day we'll actually be sitting together somewhere, having tea (or coffee), reading these lines again and smiling at how funny and simple it all started.</p>
+
+        <p style="margin-top: 40px; font-family: 'Cormorant Garamond'; font-style: italic; font-size: 1.6rem; color: #00ebff; text-align: right;">
+            Happy Birthday, Bedi! May this new year bring you as many wonderful discoveries as the beautiful colors you've brought into my life. 🌙🤍
+        </p>
+    </div>
+</div>
+    </div>
+    <footer>
+        <div class="footer-text">With best wishes <span>Bakytnur</span></div>
+        <img class="me" src="me.png" alt="me">
+    </footer>
+
+    <script>
+    window.addEventListener('DOMContentLoaded', () => {
+        // Проверка визита для отображения кнопки "Skip"
+        const skipBtn = document.getElementById('skip-intro-btn');
+        const hasVisitedBefore = localStorage.getItem('introVisited');
+
+        if (hasVisitedBefore) {
+            if (skipBtn) skipBtn.style.display = 'block'; // Показываем кнопку начиная со 2-го раза
+        } else {
+            localStorage.setItem('introVisited', 'true'); // Запоминаем 1-й раз
+        }
+    });
+
+    function startMemeVideo() {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+
+        const introScreen = document.getElementById('intro-screen');
+        const cringeStage = document.getElementById('cringe-stage');
+        const videoStage = document.getElementById('video-stage');
+        const memeVideo = document.getElementById('meme-video');
+        const broskiText = document.getElementById('broski-bubble');
+
+        if (cringeStage) cringeStage.style.display = 'none';
+        if (introScreen) introScreen.style.background = '#000000';
+        if (videoStage) videoStage.style.display = 'flex';
+
+        if (memeVideo) {
+            memeVideo.play().catch(err => {
+                console.log("Видео заблокировано:", err);
+                showEminemButton();
+            });
+
+            memeVideo.addEventListener('timeupdate', () => {
+                // Секунда появления текста «whats up broski»
+                if (broskiText) {
+                    if (memeVideo.currentTime >= 13) {
+                        broskiText.style.display = 'block';
+                    } else {
+                        broskiText.style.display = 'none';
+                    }
+                }
+
+                // Секунда появления кнопки захода на сайт
+                if (memeVideo.currentTime >= 14) {
+                    showEminemButton();
+                }
+            });
+
+            memeVideo.onended = () => {
+                showEminemButton();
+            };
+        }
+    }
+
+    function showEminemButton() {
+        const eminemBox = document.getElementById('eminem-box');
+        if (eminemBox) eminemBox.classList.add('show');
+    }
+
+    // Заглушка для внешних вызовов (если использовалось ранее)
+    if (typeof handleDogFollowing === 'undefined') {
+        window.handleDogFollowing = function() {};
+    }
+
+    function skipIntro() {
+        const dog = document.getElementById('prank-dog');
+        if (dog) dog.style.display = 'none';
+        document.removeEventListener('mousemove', handleDogFollowing);
+
+        const skipBtn = document.getElementById('skip-intro-btn');
+        if (skipBtn) skipBtn.style.display = 'none';
+
+        localStorage.setItem('introVisited', 'true');
+
+        const memeVideo = document.getElementById('meme-video');
+        if (memeVideo) {
+            memeVideo.pause();
+        }
+
+        // Запускаем переход и бесконечный салют
+        endChaosAndRevealSite();
+    }
+
+    function endChaosAndRevealSite() {
+        const flash = document.getElementById('flash');
+        const intro = document.getElementById('intro-screen');
+        const main = document.getElementById('main-content');
+        const eminemBox = document.getElementById('eminem-box');
+        const music = document.getElementById('birthday-music');
+        const skipBtn = document.getElementById('skip-intro-btn');
+
+        if (eminemBox) eminemBox.classList.remove('show');
+        if (skipBtn) skipBtn.style.display = 'none';
+        document.body.classList.remove('lock-scroll');
+
+        const memeVideo = document.getElementById('meme-video');
+        if (memeVideo) {
+            memeVideo.pause();
+        }
+
+        // Запуск конфетти перенесен до setTimeout, чтобы сработало мгновенно
+        triggerInfiniteTopConfetti();
+
+        if (flash) flash.style.opacity = '1';
+
+        if (music) {
+            music.play().catch(error => console.log("Ошибка аудио:", error));
+        }
+
+        setTimeout(() => {
+            if (intro) intro.style.display = 'none';
+            if (main) main.style.display = 'flex';
+            if (flash) flash.style.opacity = '0';
+        }, 200);
+    }
+
+    function scrollToPoster() {
+        const posterTarget = document.getElementById('poster-target');
+        if (posterTarget) {
+            posterTarget.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    function triggerInfiniteTopConfetti() {
+        if (typeof confetti !== 'function') {
+            console.error("Библиотека canvas-confetti не подключена в тегах head сайта!");
+            return;
+        }
+
+        function frame() {
+            confetti({
+                particleCount: 2,
+                origin: { x: Math.random(), y: 0 },
+                colors: ['#00ebff', '#ff007f', '#ffffff', '#0022aa'],
+                gravity: 0.85,
+                spread: 35,
+                drift: Math.random() - 0.5
+            });
+
+            if (Math.random() < 0.15) {
+                confetti({
+                    particleCount: 1,
+                    origin: { x: Math.random(), y: 0 },
+                    spread: 10,
+                    gravity: 0.6,
+                    flat: true,
+                    scalar: 2,
+                    shapes: ['text'],
+                    shapeOptions: {
+                        text: {
+                            value: ['💸']
+                        }
+                    }
+                });
+            }
+
+            // Запускает следующий кадр анимации без жестких блокировок
+            requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+    }
+
+    function changeLang(langCode) {
+        document.querySelectorAll('.lang-content').forEach(el => {
+            el.classList.remove('active');
+        });
+        document.querySelectorAll('.lang-cube').forEach(el => {
+            el.classList.remove('active');
+        });
+
+        const targetContent = document.getElementById(`lang-${langCode}`);
+        if(targetContent) targetContent.classList.add('active');
+
+        const evt = window.event;
+        if(evt && evt.currentTarget) {
+            evt.currentTarget.classList.add('active');
+        } else {
+            const btn = document.querySelector(`.lang-cube[onclick*="${langCode}"]`);
+            if(btn) btn.classList.add('active');
+        }
+    }
+
+    window.addEventListener('scroll', () => {
+        const photos = document.querySelectorAll('.cutout-photo');
+        const triggerBottom = window.innerHeight * 0.85;
+        const scrollHint = document.querySelector('.scroll-hint');
+
+        if (scrollHint) {
+            if (window.scrollY > 50) {
+                scrollHint.style.opacity = '0';
+            } else {
+                scrollHint.style.opacity = '1';
+            }
+        }
+
+        photos.forEach(photo => {
+            const photoTop = photo.getBoundingClientRect().top;
+            if (photoTop < triggerBottom) {
+                photo.classList.add('visible');
+            }
+        });
+    });
+</script>
+  </div>
+</body>
+</html>
